@@ -33,7 +33,7 @@ public class EditActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit);
         editText = (EditText) findViewById(R.id.editText);
         intent = getIntent();
-        readFile(intent.getStringExtra("ddd"));
+        readFile(intent.getStringExtra("file"));
     }
 
     private void readFile(String fileName) {
@@ -54,8 +54,6 @@ public class EditActivity extends AppCompatActivity {
                 editText.setText(builder.toString());
             }
         } catch (Throwable t) {
-           // Toast.makeText(getApplicationContext(),
-           //         "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -66,8 +64,6 @@ public class EditActivity extends AppCompatActivity {
             osw.write(editText.getText().toString());
             osw.close();
         } catch (Throwable t) {
-          //  Toast.makeText(getApplicationContext(),
-           //         "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -81,9 +77,8 @@ public class EditActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case R.id.action_add:
-                writeFile(intent.getExtras().getString("ddd"));
+                writeFile(intent.getExtras().getString("file"));
                 Intent intent = new Intent(EditActivity.this,MainActivity.class);
-                //startActivity(intent);
                 finish();
                 return true;
         }

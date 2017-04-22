@@ -1,19 +1,11 @@
 package com.koror.notepad;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.Preference;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,27 +13,31 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity   {
+
     ArrayList<String> arrayList;
     ArrayAdapter<String> adapter;
     ListView listView;
     SharedPreferences sPref;
+
+    public static final String SPREFNAME="preferencename";
+    public static final String ARRAYSIZEKEY="arr_size";
+    public static final String ARRAYNAME="arr";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         listView = (ListView) findViewById(R.id.listView);
-        arrayList = new ArrayList<String>();
-        arrayList = loadText(arrayList);
-        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrayList);
+        arrayList = new ArrayList<>();
+        arrayList = loadList(arrayList);
+        adapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,arrayList);
         listView.setAdapter(adapter);
 
         listListener();
@@ -60,10 +56,10 @@ public class MainActivity extends AppCompatActivity   {
         {
             case R.id.action_add:
                 final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Введите название.");
+                builder.setTitle(R.string.builder_title);
                 final EditText input = new EditText(MainActivity.this);
                 builder.setView(input);
-                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         boolean equals=false;
@@ -72,20 +68,21 @@ public class MainActivity extends AppCompatActivity   {
                             //проверка на совпадение имен
                             if(input.getText().toString().equals(arrayList.get(k).toString()))
                             {
-                                Toast.makeText(getApplicationContext(),"Файл с таким именем уже существует",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(),R.string.toast_error,Toast.LENGTH_SHORT).show();
                                 equals=true;
                             }
                         }
                         if(!equals) {
                             arrayList.add(input.getText().toString());
                             adapter.notifyDataSetChanged();
-                            saveText(arrayList);
+                            //запоминает новый item id которога является размер массива - 1, так как id считается от нуля
+                            addItem(input.getText().toString(),arrayList.size()-1);
                         }
 
                     }
                 });
 
-                builder.setNegativeButton("Cancal", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                     }
@@ -106,20 +103,20 @@ public class MainActivity extends AppCompatActivity   {
             public boolean onItemLongClick(AdapterView<?> adapterView,  final View itemClicked, final int in, long l) {
 
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MainActivity.this);
-                alertBuilder.setTitle("Вы хотите удалить файл " + ((TextView) itemClicked).getText() + " ?");
-                alertBuilder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                alertBuilder.setTitle(R.string.notification_of_deletion + ((TextView) itemClicked).getText().toString() + " ?");
+                alertBuilder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(getApplicationContext(),((TextView) itemClicked).getText()+" delete." , Toast.LENGTH_SHORT).show();
+                        //удаление элемента списка и файла
                         arrayList.remove(in);
                         deleteFile(((TextView) itemClicked).getText().toString());
                         adapter.notifyDataSetChanged();
-                        saveText(arrayList);
+                        deleteItem(in);
                         dialogInterface.cancel();
                     }
                 });
 
-                alertBuilder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                alertBuilder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
@@ -135,32 +132,38 @@ public class MainActivity extends AppCompatActivity   {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View itemClicked, int i, long l) {
                 Intent intent = new Intent(MainActivity.this,EditActivity.class);
-                intent.putExtra("ddd",((TextView) itemClicked).getText());
+                intent.putExtra("file",((TextView) itemClicked).getText());
                 startActivityForResult(intent,1);
 
             }
         });
 
     }
-
-    public boolean saveText(ArrayList<String> array) {
-        SharedPreferences prefs = this.getSharedPreferences("preferencename", 0);
+// запоминает новый элемент спика
+    public boolean addItem(String name,int id) {
+        SharedPreferences prefs = this.getSharedPreferences(SPREFNAME, 0);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt("arr_size", array.size());
-        for(int i=0;i<array.size();i++)
-            editor.putString("arr" + i, array.get(i));
+        editor.putInt(ARRAYSIZEKEY, arrayList.size());
+        editor.putString(ARRAYNAME + id, name);
+        return editor.commit();
+    }
+//забывает элемент списка
+    public boolean deleteItem(int id) {
+        SharedPreferences prefs = this.getSharedPreferences(SPREFNAME, 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(ARRAYSIZEKEY,arrayList.size());
+        editor.remove(ARRAYNAME + id);
         return editor.commit();
     }
 
-    public ArrayList<String> loadText(ArrayList<String> array) {
-        SharedPreferences sPref = this.getSharedPreferences("preferencename", 0);
-        int size = sPref.getInt("arr_size", 0);
+    public ArrayList<String> loadList(ArrayList<String> array) {
+        SharedPreferences sPref = this.getSharedPreferences(SPREFNAME, 0);
+        int size = sPref.getInt(ARRAYSIZEKEY, 0);
         for(int i=0;i<size;i++)
         {
-            array.add(i,sPref.getString("arr" + i, null));
+            array.add(i,sPref.getString(ARRAYNAME + i, null));
         }
         return array;
-
     }
 
 }

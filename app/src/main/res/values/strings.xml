@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Notepad</string>
+    <string name="builder_title">Введите название файла.</string>
+    <string name="button_add">Добваить</string>
+    <string name="toast_error">Файл с таким именем уже существует</string>
+    <string name="button_cancel">Отмена</string>
+    <string name="notification_of_deletion">Вы хотите удалить файл </string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 </resources>
