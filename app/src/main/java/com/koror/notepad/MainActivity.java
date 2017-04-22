@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity   {
             public boolean onItemLongClick(AdapterView<?> adapterView,  final View itemClicked, final int in, long l) {
 
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MainActivity.this);
-                alertBuilder.setTitle(R.string.notification_of_deletion + ((TextView) itemClicked).getText().toString() + " ?");
+                alertBuilder.setTitle(getResources().getString(R.string.notification_of_deletion) + " " + ((TextView) itemClicked).getText() + " ?");
                 alertBuilder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
