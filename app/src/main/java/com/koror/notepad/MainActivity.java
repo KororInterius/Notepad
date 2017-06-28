@@ -16,6 +16,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity   {
@@ -72,12 +74,16 @@ public class MainActivity extends AppCompatActivity   {
                                 equals=true;
                             }
                         }
-                        if(!equals) {
+                        if(input.getText().toString().length()>50)
+                            Toast.makeText(getApplicationContext(),R.string.toast_max_length,Toast.LENGTH_SHORT).show();
+                        if(!equals && input.getText().toString().length()<=50) {
                             arrayList.add(input.getText().toString());
                             adapter.notifyDataSetChanged();
                             //запоминает новый item id которога является размер массива - 1, так как id считается от нуля
                             addItem(input.getText().toString(),arrayList.size()-1);
                         }
+
+
 
                     }
                 });

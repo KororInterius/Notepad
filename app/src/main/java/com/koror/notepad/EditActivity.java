@@ -39,7 +39,6 @@ public class EditActivity extends AppCompatActivity {
     private void readFile(String fileName) {
         try {
             InputStream inputStream = openFileInput(fileName);
-
             if (inputStream != null) {
                 InputStreamReader isr = new InputStreamReader(inputStream);
                 BufferedReader reader = new BufferedReader(isr);

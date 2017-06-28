@@ -7,4 +7,5 @@
     <string name="notification_of_deletion">Вы хотите удалить файл </string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="toast_max_length">Слишком длинное имя файла</string>
 </resources>
